@@ -54,6 +54,8 @@
     (:reveal-min-scale "REVEAL_MIN_SCALE" nil org-reveal-min-scale t)
     (:reveal-max-scale "REVEAL_MAX_SCALE" nil org-reveal-max-scale t)
     (:reveal-root "REVEAL_ROOT" nil org-reveal-root t)
+    (:reveal-auto-background "REVEAL_AUTO_BACKGROUND" nil org-reveal-auto-background t)
+    (:reveal-force-notes "REVEAL_FORCE_NOTES" nil org-reveal-force-notes t)
     (:reveal-trans "REVEAL_TRANS" nil org-reveal-transition t)
     (:reveal-speed "REVEAL_SPEED" nil org-reveal-transition-speed t)
     (:reveal-theme "REVEAL_THEME" nil org-reveal-theme t)
@@ -167,6 +169,12 @@ can be include."
   :group 'org-export-reveal
   :type 'boolean)
 
+(defcustom org-reveal-auto-background nil
+  "Reveal reference reveal_background on each slide.
+Describes a relative path, with format."
+  :group 'org-export-reveal
+  :type 'string)
+
 (defcustom org-reveal-keyboard t
   "Reveal use keyboard navigation."
   :group 'org-export-reveal
@@ -174,6 +182,11 @@ can be include."
 
 (defcustom org-reveal-overview t
   "Reveal show overview."
+  :group 'org-export-reveal
+  :type 'boolean)
+
+(defcustom org-reveal-force-notes nil
+  "Reveal force all content to speaker notes."
   :group 'org-export-reveal
   :type 'boolean)
 
@@ -249,7 +262,6 @@ can be include."
   (cond
    ((string= frag t) " class=\"fragment\"")
    (frag (format " class=\"fragment %s\"" frag))))
-  
 
 (defun org-reveal-export-block (export-block contents info)
   "Transocde a EXPORT-BLOCK element from Org to Reveal.
@@ -319,7 +331,7 @@ holding contextual information."
              ;; into vertical ones.
              "<section>\n")
          ;; Start a new slide.
-         (format "<section id=\"%s\" %s%s%s%s%s%s%s>\n"
+         (format "<section id=\"%s\" %s%s%s%s%s%s%s%s>\n"
                  (or (org-element-property :CUSTOM_ID headline)
                      (concat "sec-" (mapconcat 'number-to-string
                                                (org-export-get-headline-number headline info)
@@ -327,24 +339,42 @@ holding contextual information."
                  (if-format " data-state=\"%s\"" (org-element-property :REVEAL_DATA_STATE headline))
                  (if-format " data-transition=\"%s\"" (org-element-property :REVEAL_DATA_TRANSITION headline))
                  (if-format " data-background=\"%s\"" (org-element-property :REVEAL_BACKGROUND headline))
+                 (if-format " data-background=\"%s\"" (if (plist-get info :reveal-auto-background)
+                                                          (apply 'format (plist-get info :reveal-auto-background)
+                                                                 (append (org-export-get-headline-number headline info)
+                                                                         (make-list 9 0)))))
                  (if-format " data-background-size=\"%s\"" (org-element-property :REVEAL_BACKGROUND_SIZE headline))
                  (if-format " data-background-repeat=\"%s\"" (org-element-property :REVEAL_BACKGROUND_REPEAT headline))
                  (if-format " data-background-transition=\"%s\"" (org-element-property :REVEAL_BACKGROUND_TRANS headline))
-                 (if-format " %s" (org-element-property :REVEAL_EXTRA_ATTR headline)))
-         ;; The HTML content of this headline.
-         (format "\n<h%d%s>%s</h%d>\n"
-                 level1
-                 (if-format " class=\"fragment %s\""
-                            (org-element-property :REVEAL-FRAG headline))
-                 full-text
-                 level1)
-         ;; When there is no section, pretend there is an empty
-         ;; one to get the correct <div class="outline- ...>
-         ;; which is needed by `org-info.js'.
-         (if (not (eq (org-element-type first-content) 'section))
-             (concat (org-reveal-section first-content "" info)
-                     contents)
-           contents)
+                 (if-format " %s" (org-element-property :REVEAL_EXTRA_ATTR headline))
+
+                 ;; The HTML content of this headline.
+                 (format "\n<h%d%s>%s</h%d>\n"
+                         level1
+                         (if-format " class=\"fragment %s\""
+                                    (org-element-property :REVEAL-FRAG headline))
+                         full-text
+                         level1))
+
+         (if (plist-get info :reveal-force-notes)
+             (concat
+              "<aside class=\"notes\">\n"
+              (format "<h%d%s>%s</h%d>\n"
+                      level1
+                      (if-format " class=\"fragment %s\""
+                                 (org-element-property :REVEAL-FRAG headline))
+                      full-text
+                      level1)
+              contents
+              "</aside>")
+           ;; When there is no section, pretend there is an empty
+           ;; one to get the correct <div class="outline- ...>
+           ;; which is needed by `org-info.js'.
+           (if (not (eq (org-element-type first-content) 'section))
+               (concat (org-reveal-section first-content "" info)
+                       contents)
+             contents))
+
          (if (= level hlevel)
              ;; Add an extra "</section>" to stop vertical slide
              ;; grouping.
@@ -729,12 +759,14 @@ info is a plist holding export options."
    "</head>
 <body>\n"
    (org-reveal--build-pre/postamble 'preamble info)
-"<div class=\"reveal\">
-<div class=\"slides\">
-<section>
-"
-   (format-spec (plist-get info :reveal-title-slide-template) (org-html-format-spec info))
-   "</section>\n"
+   "<div class=\"reveal\">
+<div class=\"slides\">\n"
+   (if (not (string-empty-p (plist-get info :reveal-title-slide-template)))
+    (concat
+     "<section>\n"
+     (format-spec (plist-get info :reveal-title-slide-template) (org-html-format-spec info))
+     "</section>\n")
+    "")
    contents
    "</div>
 </div>\n"
@@ -742,7 +774,6 @@ info is a plist holding export options."
    (org-reveal-scripts info)
    "</body>
 </html>\n"))
-
 
 
 (defun org-reveal-export-to-html
