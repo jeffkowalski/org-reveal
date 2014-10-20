@@ -358,13 +358,9 @@ holding contextual information."
 
          (if (plist-get info :reveal-force-notes)
              (concat
-              "<aside class=\"notes\">\n"
-              (format "<h%d%s>%s</h%d>\n"
-                      level1
-                      (if-format " class=\"fragment %s\""
-                                 (org-element-property :REVEAL-FRAG headline))
-                      full-text
-                      level1)
+              "<aside class=\"notes\">"
+              full-text
+              "\n"
               contents
               "</aside>")
            ;; When there is no section, pretend there is an empty
