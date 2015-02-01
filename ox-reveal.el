@@ -58,6 +58,7 @@
     (:reveal-root "REVEAL_ROOT" nil org-reveal-root t)
     (:reveal-auto-background "REVEAL_AUTO_BACKGROUND" nil org-reveal-auto-background t)
     (:reveal-force-notes "REVEAL_FORCE_NOTES" nil org-reveal-force-notes t)
+    (:reveal-background-trans "REVEAL_BACKGROUND_TRANS" nil org-reveal-background-transition t)
     (:reveal-trans "REVEAL_TRANS" nil org-reveal-transition t)
     (:reveal-speed "REVEAL_SPEED" nil org-reveal-transition-speed t)
     (:reveal-theme "REVEAL_THEME" nil org-reveal-theme t)
@@ -132,6 +133,12 @@ can be include."
 (defcustom org-reveal-transition
   "default"
   "Reveal transistion style."
+  :group 'org-export-reveal
+  :type 'string)
+
+(defcustom org-reveal-background-transition
+  "default"
+  "Reveal background transition style."
   :group 'org-export-reveal
   :type 'string)
 
@@ -517,13 +524,15 @@ overview: %s,
      (let ((max-scale (string-to-number (plist-get info :reveal-max-scale))))
        (if (> max-scale 0) (format "maxScale: %.2f,\n" max-scale) ""))
 
-     ;; thems and transitions
+     ;; themes and transitions
      (format "
 theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
 transition: Reveal.getQueryHash().transition || '%s', // default/cube/page/concave/zoom/linear/fade/none
-transitionSpeed: '%s',\n"
+transitionSpeed: '%s',
+backgroundTransition: Reveal.getQueryHash().backgroundTransition || '%s', // default/cube/page/concave/zoom/linear/fade/none\n"
              (plist-get info :reveal-trans)
-             (plist-get info :reveal-speed))
+             (plist-get info :reveal-speed)
+             (plist-get info :reveal-background-trans))
 
      ;; multiplexing - depends on defvar 'client-multiplex'
      (when (plist-get info :reveal-multiplex-id)
@@ -538,7 +547,6 @@ transitionSpeed: '%s',\n"
                (format "null"))
              (plist-get info :reveal-multiplex-id)
              (plist-get info :reveal-multiplex-url)))
-
      ;; optional JS library heading
      "
 // Optional libraries used to extend on reveal.js
