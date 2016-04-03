@@ -451,6 +451,8 @@ holding contextual information."
                   `(:id ,(format "slide-%s" preferred-id)
                         :data-state ,(org-element-property :REVEAL_DATA_STATE headline)
                         :data-background ,(org-element-property :REVEAL_BACKGROUND headline)
+                        :data-background-video ,(org-element-property :REVEAL_BACKGROUND_VIDEO headline)
+                        :data-background-iframe ,(org-element-property :REVEAL_BACKGROUND_IFRAME headline)
                         :data-background-size ,(org-element-property :REVEAL_BACKGROUND_SIZE headline)
                         :data-background-repeat ,(org-element-property :REVEAL_BACKGROUND_REPEAT headline)
                         :data-background-transition ,(org-element-property :REVEAL_BACKGROUND_TRANS headline)))

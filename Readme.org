@@ -44,7 +44,7 @@
 
    Extract Reveal.js folders from the downloaded zip file.
 
-   If you do not wish to download reveal.js yourself and would rather get a copy from a CDN, 
+   If you do not wish to download reveal.js yourself and would rather get a copy from a CDN,
    see the section [[Set the location of Reveal.js]]
 
 ** Install org-reveal from MELPA
@@ -273,8 +273,36 @@
     :END:
 #+END_SRC
 
+*** Single Video Background
+    :PROPERTIES:
+    :reveal_background_video: http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4
+    :END:
+
+    Set property =reveal_background_video= to an URL of background video.
+#+BEGIN_SRC org
+,*** Single Video Background
+    :PROPERTIES:
+    :reveal_background_video: http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4
+    :END:
+#+END_SRC
+
+*** IFrame Background
+    :PROPERTIES:
+    :reveal_background_iframe: https://slides.com
+    :END:
+
+    Set property =reveal_background_iframe= to a URL to embed the web
+    page as a background.
+    Note that the page won't be interactive.
+#+BEGIN_SRC org
+,*** Single Image Background
+    :PROPERTIES:
+    :reveal_background_iframe: https://slides.com
+    :END:
+#+END_SRC
+
 *** Title Slide Background Image
-    
+
     To set the title slide's background image, please specify the
     following options:
 
@@ -306,9 +334,9 @@
    From Reveal.js 3.1.0, slide numbering can have several custom
    formats. To choose one format, please set ~reveal_slide_number~ to
    its proper string. For example, ~reveal_slide_number:h/v~.
-   
+
    Supported format string can be found in [[https://github.com/hakimel/reveal.js/#slide-number][Reveal.js manual]].
-   
+
 
 ** Slide Header/Footer
    Specify Slide header/footer by =#+REVEAL_SLIDE_HEADER:= and
@@ -326,7 +354,7 @@
     Paragraphs can be fragmented.
 
 #+ATTR_REVEAL: :frag roll-in
-    - Lists can 
+    - Lists can
     - be fragmented.
 
 #+ATTR_REVEAL: :frag roll-in
@@ -344,7 +372,7 @@
     * highlight-blue
     * appear
 
-    Setting ~:frag t~ will use Reveal.js default fragment style, which 
+    Setting ~:frag t~ will use Reveal.js default fragment style, which
     can be overridden by local option ~#+REVEAL_DEFAULT_FRAG_STYLE~ or
     global variable ~org-reveal-default-frag-style~.
 
@@ -451,9 +479,9 @@
    1. Use your Emacs theme
    2. Use highlight.js
 
-      
+
    To Use your Emacs theme, please make sure ~htmlize.el~ is
-   installed. Then no more setup is necessary.  
+   installed. Then no more setup is necessary.
 
    Below is an example. Codes are copied from [[http://www.haskell.org/haskellwiki/The_Fibonacci_sequence][Haskell Wiki]].
    #+BEGIN_SRC haskell
@@ -467,7 +495,7 @@
 *** Using highlight.js
 
     You can also use [[http://hightlightjs.org][highlight.js]], by adding ~highlight~ to the Reveal.js
-    plugin list. 
+    plugin list.
     #+BEGIN_SRC org
       ,#+REVEAL_PLUGINS: (highlight)
     #+END_SRC
@@ -475,7 +503,7 @@
     The default highlighting theme is ~zenburn.css~ brought with
     Reveal.js. To use other themes, please specify the CSS file name by
     ~#+REVEAL_HIGHLIGHT_CSS~ or the variable ~org-reveal-highlight-css~.
-    
+
     The "%r" in the given CSS file name will be replaced by Reveal.js'
     URL.
 
